@@ -32,12 +32,11 @@ resource "digitalocean_droplet" "gpuhost" {
       "echo ${var.ngc_api_key} | docker login nvcr.io --username '$oauthtoken' --password-stdin",
       "curl -LO https://api.ngc.nvidia.com/v2/resources/nvidia/ngc-apps/ngc_cli/versions/3.54.0/files/ngccli_linux.zip",
       "unzip ngccli_linux.zip && chmod u+x ngc-cli/ngc && rm -rf ./ngccli_linux.zip",
-      "./ngc-cli/ngc registry image list --format_type ascii nvcr.io/nim/*",
       "mkdir -p ~/.cache/nim",
-      "nerdctl run -d --gpus all --shm-size=16GB --name myllama -e NGC_API_KEY -v ~/.cache/nim:/opt/nim/.cache -u 0 -p 8000:8000 nvcr.io/nim/meta/llama-3.1-8b-instruct:latest",
+      "nerdctl run -d --gpus all --shm-size=16GB --name nimcontainer -e NGC_API_KEY -v ~/.cache/nim:/opt/nim/.cache -u 0 -p 8000:8000 nvcr.io/${var.nim_image}",
       "iptables -A CNI-FORWARD -p tcp -m tcp --dport 8000 -j ACCEPT",
     ]
   }
 }
-
+output "deployed_image" {value=var.nim_image}
 output "host_ip_address" {value=digitalocean_droplet.gpuhost.ipv4_address}

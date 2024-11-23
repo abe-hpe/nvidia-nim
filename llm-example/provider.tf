@@ -10,6 +10,7 @@ terraform {
 variable "do_token" {}
 variable "pvt_key" {}
 variable "ngc_api_key" {}
+variable "nim_image" {}
 
 provider "digitalocean" {
   token = var.do_token
