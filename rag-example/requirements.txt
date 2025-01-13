@@ -1,0 +1,9 @@
+faiss_cpu==1.8.0
+fastapi==0.104.1
+langchain
+langchain-community
+langchain-core
+langchain-nvidia-ai-endpoints==0.2.0
+numpy==1.26.4
+sentence-transformers==2.2.2
+unstructured==0.11.8
