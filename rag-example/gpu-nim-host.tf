@@ -1,11 +1,13 @@
 resource "digitalocean_droplet" "gpuhost" {
-  image = "gpu-h100x1-base"
-  region = "tor1"
-  size = "gpu-h100x1-80gb"
+  #image = "gpu-h100x1-base"
+  image = "ubuntu-24-10-x64"
+  region = "sfo3"
+  #size = "gpu-h100x1-80gb"
+  size = "s-1vcpu-512mb-10gb"
 
   #create one resource for each name in the gpuhost_names list
-  count = length(var.gpuhost_names)
-  name  = var.gpuhost_names[count.index]
+  for_each = toset( var.gpuhost_names )
+  name = each.key
 
   ssh_keys = [
     data.digitalocean_ssh_key.vtadmin.id
@@ -21,9 +23,24 @@ resource "digitalocean_droplet" "gpuhost" {
   
   provisioner "remote-exec" {
     inline = [
-      "export PATH=$PATH:/usr/bin; export DEBIAN_FRONTEND=noninteractive; export NGC_API_KEY=${var.ngc_api_key}"
+      "echo ${var.ngc_api_key} > /root/ngc-api-key"
     ]
   }
 }
 
-output "host_info" {value=[digitalocean_droplet.gpuhost[*].name,digitalocean_droplet.gpuhost[*].ipv4_address]}
+resource "digitalocean_record" "endpoints" {
+  domain = "quyver.com"
+  type   = "A"
+  ttl    = "300"
+  for_each = digitalocean_droplet.gpuhost
+  name   = each.value.name
+  value  = each.value.ipv4_address
+}
+
+
+output "host_info" {
+  value = {
+    for host, values in digitalocean_droplet.gpuhost : host => values.ipv4_address
+  }
+}
+

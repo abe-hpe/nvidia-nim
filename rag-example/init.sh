@@ -1,4 +1,6 @@
 #!/bin/bash
+export PATH=$PATH:/usr/bin
+export DEBIAN_FRONTEND=noninteractive
 apt-get update
 sleep 30
 apt-get install -yq apt-transport-https ca-certificates curl gpg lsb-release unzip

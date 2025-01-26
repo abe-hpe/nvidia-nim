@@ -13,7 +13,6 @@ variable "ngc_api_key" {}
 variable "gpuhost_names" {
   description = "Names for the GPU hosts"
   type        = list(string)
-  default     = ["llmhost","embeddinghost"]
 }
 
 provider "digitalocean" {
